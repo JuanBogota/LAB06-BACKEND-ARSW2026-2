@@ -8,6 +8,7 @@ import edu.eci.arsw.blueprints.persistence.repository.BlueprintJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -43,12 +44,10 @@ public class PostgresBlueprintPersistence implements BlueprintPersistence {
     }
 
     @Override
-    public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException {
-        List<BlueprintEntity> entities = repo.findByAuthor(author);
-        if (entities.isEmpty()) {
-            throw new BlueprintNotFoundException("No blueprints for author: " + author);
-        }
-        return entities.stream().map(this::toDomain).collect(Collectors.toSet());
+    public Set<Blueprint> getBlueprintsByAuthor(String author) {
+        return repo.findByAuthor(author).stream()
+                .map(this::toDomain)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -63,6 +62,25 @@ public class PostgresBlueprintPersistence implements BlueprintPersistence {
                         "Blueprint not found: %s/%s".formatted(author, name)));
         entity.getPoints().add(new PointEmbeddable(x, y));
         repo.save(entity);
+    }
+
+    @Override
+    @Transactional
+    public void replacePoints(String author, String name, List<Point> points) throws BlueprintNotFoundException {
+        BlueprintEntity entity = repo.findByAuthorAndName(author, name)
+                .orElseThrow(() -> new BlueprintNotFoundException(
+                        "Blueprint not found: %s/%s".formatted(author, name)));
+        entity.getPoints().clear();
+        points.forEach(p -> entity.getPoints().add(new PointEmbeddable(p.x(), p.y())));
+    }
+
+    @Override
+    @Transactional
+    public void deleteBlueprint(String author, String name) throws BlueprintNotFoundException {
+        BlueprintEntity entity = repo.findByAuthorAndName(author, name)
+                .orElseThrow(() -> new BlueprintNotFoundException(
+                        "Blueprint not found: %s/%s".formatted(author, name)));
+        repo.delete(entity);
     }
 
     private BlueprintEntity toEntity(Blueprint bp) {

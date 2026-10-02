@@ -44,12 +44,10 @@ public class InMemoryBlueprintPersistence implements BlueprintPersistence {
     }
 
     @Override
-    public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException {
-        Set<Blueprint> set = blueprints.values().stream()
+    public Set<Blueprint> getBlueprintsByAuthor(String author) {
+        return blueprints.values().stream()
                 .filter(bp -> bp.getAuthor().equals(author))
                 .collect(Collectors.toSet());
-        if (set.isEmpty()) throw new BlueprintNotFoundException("No blueprints for author: " + author);
-        return set;
     }
 
     @Override
@@ -61,5 +59,19 @@ public class InMemoryBlueprintPersistence implements BlueprintPersistence {
     public void addPoint(String author, String name, int x, int y) throws BlueprintNotFoundException {
         Blueprint bp = getBlueprint(author, name);
         bp.addPoint(new Point(x, y));
+    }
+
+    @Override
+    public void replacePoints(String author, String name, List<Point> points) throws BlueprintNotFoundException {
+        Blueprint updated = blueprints.computeIfPresent(keyOf(author, name),
+                (k, old) -> new Blueprint(author, name, new ArrayList<>(points)));
+        if (updated == null) throw new BlueprintNotFoundException("Blueprint not found: %s/%s".formatted(author, name));
+    }
+
+    @Override
+    public void deleteBlueprint(String author, String name) throws BlueprintNotFoundException {
+        if (blueprints.remove(keyOf(author, name)) == null) {
+            throw new BlueprintNotFoundException("Blueprint not found: %s/%s".formatted(author, name));
+        }
     }
 }
