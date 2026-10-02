@@ -9,6 +9,8 @@ import edu.eci.arsw.blueprints.model.Blueprint;
 import edu.eci.arsw.blueprints.persistence.BlueprintNotFoundException;
 import edu.eci.arsw.blueprints.persistence.BlueprintPersistence;
 import edu.eci.arsw.blueprints.persistence.BlueprintPersistenceException;
+import java.util.List;
+import edu.eci.arsw.blueprints.model.Point;
 
 @Service
 public class BlueprintsServices {
@@ -29,7 +31,7 @@ public class BlueprintsServices {
         return persistence.getAllBlueprints();
     }
 
-    public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException {
+    public Set<Blueprint> getBlueprintsByAuthor(String author) {
         return persistence.getBlueprintsByAuthor(author);
     }
 
@@ -40,5 +42,13 @@ public class BlueprintsServices {
     
     public void addPoint(String author, String name, int x, int y) throws BlueprintNotFoundException {
         persistence.addPoint(author, name, x, y);
+    }
+
+    public void replacePoints(String author, String name, List<Point> points) throws BlueprintNotFoundException {
+        persistence.replacePoints(author, name, points);
+    }
+
+    public void deleteBlueprint(String author, String name) throws BlueprintNotFoundException {
+        persistence.deleteBlueprint(author, name);
     }
 }

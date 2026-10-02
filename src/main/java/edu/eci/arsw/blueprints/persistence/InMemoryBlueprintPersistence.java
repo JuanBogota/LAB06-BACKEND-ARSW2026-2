@@ -44,12 +44,10 @@ public class InMemoryBlueprintPersistence implements BlueprintPersistence {
     }
 
     @Override
-    public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException {
-        Set<Blueprint> set = blueprints.values().stream()
+    public Set<Blueprint> getBlueprintsByAuthor(String author) {
+        return blueprints.values().stream()
                 .filter(bp -> bp.getAuthor().equals(author))
                 .collect(Collectors.toSet());
-        if (set.isEmpty()) throw new BlueprintNotFoundException("No blueprints for author: " + author);
-        return set;
     }
 
     @Override

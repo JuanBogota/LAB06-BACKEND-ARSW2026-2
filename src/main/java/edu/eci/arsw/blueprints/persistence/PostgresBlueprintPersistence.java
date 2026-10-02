@@ -44,12 +44,10 @@ public class PostgresBlueprintPersistence implements BlueprintPersistence {
     }
 
     @Override
-    public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException {
-        List<BlueprintEntity> entities = repo.findByAuthor(author);
-        if (entities.isEmpty()) {
-            throw new BlueprintNotFoundException("No blueprints for author: " + author);
-        }
-        return entities.stream().map(this::toDomain).collect(Collectors.toSet());
+    public Set<Blueprint> getBlueprintsByAuthor(String author) {
+        return repo.findByAuthor(author).stream()
+                .map(this::toDomain)
+                .collect(Collectors.toSet());
     }
 
     @Override
