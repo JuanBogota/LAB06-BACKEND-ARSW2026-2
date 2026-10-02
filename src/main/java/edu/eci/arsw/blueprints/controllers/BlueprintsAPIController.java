@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 import edu.eci.arsw.blueprints.model.ApiResponse;
 import edu.eci.arsw.blueprints.model.Blueprint;
@@ -40,8 +43,7 @@ public class BlueprintsAPIController {
     // GET /blueprints/{author}
     @Operation(summary = "Obtener blueprints de un autor")
     @GetMapping("/{author}")
-    public ResponseEntity<ApiResponse<Set<Blueprint>>> byAuthor(@PathVariable String author)
-            throws BlueprintNotFoundException {
+    public ResponseEntity<ApiResponse<Set<Blueprint>>> byAuthor(@PathVariable String author) {
         return ResponseEntity.ok(ApiResponse.ok(services.getBlueprintsByAuthor(author)));
     }
 
@@ -77,9 +79,38 @@ public class BlueprintsAPIController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ApiResponse.accepted(updated));
     }
 
+    // PUT /blueprints/{author}/{bpname}
+    @Operation(summary = "Reemplazar todos los puntos de un blueprint")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "202", description = "Blueprint actualizado")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Datos inválidos")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Blueprint no existe")
+    @PutMapping("/{author}/{bpname}")
+    public ResponseEntity<ApiResponse<Blueprint>> replacePoints(
+            @PathVariable String author, @PathVariable String bpname,
+            @Valid @RequestBody ReplacePointsRequest req)
+            throws BlueprintNotFoundException {
+        services.replacePoints(author, bpname, req.points());
+        Blueprint updated = services.getBlueprint(author, bpname);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ApiResponse.accepted(updated));
+    }
+
+    // DELETE /blueprints/{author}/{bpname}
+    @Operation(summary = "Eliminar un blueprint")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Blueprint eliminado")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Blueprint no existe")
+    @DeleteMapping("/{author}/{bpname}")
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @PathVariable String author, @PathVariable String bpname)
+            throws BlueprintNotFoundException {
+        services.deleteBlueprint(author, bpname);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
     public record NewBlueprintRequest(
             @NotBlank String author,
             @NotBlank String name,
             @Valid java.util.List<Point> points
     ) { }
+
+    public record ReplacePointsRequest(@NotNull @Valid List<Point> points) { }
 }
