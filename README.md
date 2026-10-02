@@ -9,10 +9,10 @@ Este repositorio es el **backend** del Laboratorio 6 (BluePrints en tiempo real)
 | Repositorio | Contenido |
 |---|---|
 | **Backend** (este) | API REST + WebSocket/STOMP |
-| [Frontend](https://github.com/JuanBogota/LAB06-FRONTEND-ARSW2026-2) | Interfaz en React + Vite, y **el informe del laboratorio** (decisiones, evidencia y análisis) |
+| [Frontend](https://github.com/JuanBogota/LAB06-FRONTEND-ARSW2026-2) | Interfaz en React + Vite
 
 > El informe completo del laboratorio 6 está en el README del repositorio del frontend. Este README explica solo cómo ejecutar y usar el backend.
-> El informe original del laboratorio 3 (REST, PostgreSQL, Swagger y filtros) se conserva en [`LAB03-INFORME.md`](LAB03-INFORME.md).
+
 
 ---
 
